@@ -7,7 +7,6 @@ import { getUsernameData } from '../contract/contract/getFunctions';
 import { fetchAllNfts, fetchMyNfts } from '../store/nftSlice';
 import { TOASTS } from '../utils/constants';
 import toastFunction from '../utils/spinners.js/ToastShow';
-import { Storage } from 'aws-amplify';
 
 function Card({ props }) {
     const dispatch = useDispatch();
@@ -25,6 +24,8 @@ function Card({ props }) {
         getUrl();
         setUsernameFun();
     }, [props.tokenId])
+
+    
 
     const setUsernameFun = async () => {
         const user = await getUsernameData(props.tokenId);
@@ -49,15 +50,7 @@ function Card({ props }) {
     }
 
     const getUrl = async ()=>{
-        await Storage.get(props.nftURL, { download: true }).then(res => {
-            console.log("cards")
-            console.log(res)
-            setImage(URL.createObjectURL(res.Body))
-        }).catch((err) => {
-                 toastFunction(TOASTS.WARNING, "Something went wrong");
-                 console.log("cards")
-                 console.log(err);
-                });
+        setImage(`https://nft-vishal-0987.s3.amazonaws.com/public/${props.nftURL}`)
     }
   
 

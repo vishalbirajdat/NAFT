@@ -10,8 +10,7 @@ import toastFunction from '../utils/spinners.js/ToastShow';
 import { TOASTS } from '../utils/constants';
 import { addMyNFT, fetchMyNfts } from '../store/nftSlice';
 import { getLastToken } from '../contract/contract/getFunctions';
-  import { Storage } from 'aws-amplify';
-
+import { Amplify, Storage } from 'aws-amplify';
 
 const CreateNft = () => {
     const dispatch = useDispatch();
@@ -34,7 +33,21 @@ const CreateNft = () => {
 
     }
 
-
+    useEffect(() => {
+        Amplify.configure({
+            Auth: {
+                mandatorySignIn: false,
+                identityPoolId: 'us-east-2:cb760161-bb1f-4dd4-9018-49c443a9cce5', //REQUIRED - Amazon Cognito Identity Pool ID
+                region: 'us-east-2', // REQUIRED - Amazon Cognito Region
+            },
+            Storage: {
+                AWSS3: {
+                    bucket: 'nft-vishal-0987', //REQUIRED -  Amazon S3 bucket name
+                    region: 'us-east-1',
+                }
+            }
+        });
+    }, [provider])
 
 
     const uploadNftURL = async () => {
@@ -47,16 +60,8 @@ const CreateNft = () => {
                     console.log("Uploaded image to s3: ", res.key)
                     setFileURL(res.key);
                     toastFunction(TOASTS.SUCCESS, "Success Fully Uploaded File");
-                    
-                    
-                    await Storage.get(res.key, { download: true }).then(res => {
-                        console.log(URL.createObjectURL(res.Body));
-                        setNFTimage(URL.createObjectURL(res.Body))
-                    }).catch((err) => {
-                        toastFunction(TOASTS.WARNING, "Something went wrong");
-                        console.log(err);
-                    });
-                    
+                    setNFTimage(`https://nft-vishal-0987.s3.amazonaws.com/public/${res.key
+                        }`)
                     setIsFileUploading(false);
                 }
                 ).catch(err => {
