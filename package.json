@@ -1,0 +1,29 @@
+{
+  "name": "naft-marketplace-169023",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.8.5",
+    "aws-amplify": "^4.3.39",
+    "axios": "^0.27.2",
+    "ethers": "^5.7.1",
+    "file-data": "^2.0.1",
+    "next": "12.3.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-dropzone-uploader": "^2.11.0",
+    "react-redux": "^8.0.2",
+    "react-spinners": "^0.13.4",
+    "react-toastify": "^9.0.8"
+  },
+  "devDependencies": {
+    "eslint": "8.23.0",
+    "eslint-config-next": "12.3.0"
+  }
+}
