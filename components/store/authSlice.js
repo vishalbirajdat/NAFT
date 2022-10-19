@@ -15,9 +15,13 @@ const authSlice = createSlice({
               state.address = action.payload.address
             state.balance = action.payload.balance
         },
+
+        balanceChanged(state, action){
+            state.balance = action.payload
+        }
       
     },
 });
 
-export const { changed } = authSlice.actions;
+export const { changed, balanceChanged } = authSlice.actions;
 export default authSlice.reducer;

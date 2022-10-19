@@ -6,13 +6,13 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 const firebaseConfig = {
-    apiKey: "AIzaSyBs7h6aCOcjDuRDowR2gUy-FogBqHI-QBU",
-    authDomain: "naft-559f7.firebaseapp.com",
-    projectId: "naft-559f7",
-    storageBucket: "naft-559f7.appspot.com",
-    messagingSenderId: "96477081373",
-    appId: "1:96477081373:web:d2394e9cf94b13418ffbf4",
-    measurementId: "G-1PWXJ5FRZP"
+    apiKey: process.env.NEXT_PUBLIC_apiKey,
+    authDomain: process.env.NEXT_PUBLIC_authDomain,
+    projectId: process.env.NEXT_PUBLIC_projectId,
+    storageBucket: process.env.NEXT_PUBLIC_storageBucket,
+    messagingSenderId: process.env.NEXT_PUBLIC_messagingSenderId,
+    appId: process.env.NEXT_PUBLIC_appId,
+    measurementId: process.env.NEXT_PUBLIC_measurementId
 };
 
 // Initialize Firebase
