@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 import { STATUSES, TOASTS } from '../utils/constants';
 import PacmanLoader from "react-spinners/PacmanLoader";
 import toastFunction from '../utils/spinners.js/ToastShow';
-import Uploadfile from '../components/Uploadfile';
 
 const Index = () => {
   const dispatch = useDispatch();

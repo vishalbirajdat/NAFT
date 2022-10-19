@@ -10,7 +10,16 @@ import toastFunction from '../utils/spinners.js/ToastShow';
 import { TOASTS } from '../utils/constants';
 import { addMyNFT, fetchMyNfts } from '../store/nftSlice';
 import { getLastToken } from '../contract/contract/getFunctions';
-import { Amplify, Storage } from 'aws-amplify';
+
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  list,
+} from "firebase/storage";
+import { v4 } from "uuid";
+import { storage } from "../utils/firebase"
 
 const CreateNft = () => {
     const dispatch = useDispatch();
@@ -33,22 +42,7 @@ const CreateNft = () => {
 
     }
 
-    useEffect(() => {
-        Amplify.configure({
-            Auth: {
-                mandatorySignIn: false,
-                identityPoolId: 'us-east-2:cb760161-bb1f-4dd4-9018-49c443a9cce5', //REQUIRED - Amazon Cognito Identity Pool ID
-                region: 'us-east-2', // REQUIRED - Amazon Cognito Region
-            },
-            Storage: {
-                AWSS3: {
-                    bucket: 'nft-vishal-0987', //REQUIRED -  Amazon S3 bucket name
-                    region: 'us-east-1',
-                }
-            }
-        });
-    }, [provider])
-
+   
 
     const uploadNftURL = async () => {
         setIsFileUploading(true);
@@ -56,19 +50,23 @@ const CreateNft = () => {
             if (file) {
                 console.log(file.name);
                 const fileName = new Date().valueOf().toString() + file.name;
-                await Storage.put(fileName , file).then(async res => {
-                    console.log("Uploaded image to s3: ", res.key)
-                    setFileURL(res.key);
-                    toastFunction(TOASTS.SUCCESS, "Success Fully Uploaded File");
-                    setNFTimage(`https://nft-vishal-0987.s3.amazonaws.com/public/${res.key
-                        }`)
-                    setIsFileUploading(false);
-                }
-                ).catch(err => {
+
+                const imageRef = ref(storage, `images/${fileName + v4()}`);
+                uploadBytes(imageRef, file).then((snapshot) => {
+                        getDownloadURL(snapshot.ref).then((url) => {
+                            setFileURL(url);
+                            setNFTimage(url);
+                            setIsFileUploading(false);
+                            toastFunction(TOASTS.SUCCESS, "SUCCESSFULLY UPLOADED");
+                            // setImageUrls((prev) => [...prev, url]);
+                        });
+                    }).catch(err => {
                     console.log(err);
                     toastFunction(TOASTS.ERROR, "Something is wrong");
                     setIsFileUploading(false)
-                })
+                });
+
+              
             }
             else {
                 toastFunction(TOASTS.ERROR, "please add nft details");
@@ -80,7 +78,7 @@ const CreateNft = () => {
             setIsFileUploading(false);
         }
 
-
+        
     }
 
     function OnChnagePrice(e) {
@@ -96,6 +94,11 @@ const CreateNft = () => {
             setUsername(e.target.value);
         }
     }
+
+
+    
+
+
 
     function OnChnageTitle(e) {
         console.log(e.target.value);

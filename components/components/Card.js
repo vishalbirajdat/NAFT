@@ -50,7 +50,7 @@ function Card({ props }) {
     }
 
     const getUrl = async ()=>{
-        setImage(`https://nft-vishal-0987.s3.amazonaws.com/public/${props.nftURL}`)
+        setImage(props.nftURL);
     }
   
 
