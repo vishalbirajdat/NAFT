@@ -1328,3 +1328,55 @@ a {
 		background-color: rgba(0, 0, 0, 0.8);
 	}
 }
+
+.switch input {
+	display: none;
+}
+
+.switch {
+	display: inline-block;
+	width: 50px; /*=w*/
+	height: 20px; /*=h*/
+	transform: translateY(50%);
+	position: relative;
+}
+
+.slider {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border-radius: 10px;
+	cursor: pointer;
+	border: 4px solid transparent;
+	overflow: hidden;
+	transition: 0.2s;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	width: 100%;
+	height: 100%;
+	border-radius: 10px;
+	transition: 0.2s;
+}
+
+.slideroff:before {
+	transform: translateX(-30px); /*translateX(-(w-h))*/
+	background-color: red;
+}
+
+.slideroff {
+	box-shadow: 0 0 0 2px red, 0 0 4px red;
+}
+
+.slideron:before {
+	transform: translateX(30px); /*translateX(w-h)*/
+	background-color: limeGreen;
+}
+
+.slideron {
+	box-shadow: 0 0 0 2px limeGreen, 0 0 8px limeGreen;
+}

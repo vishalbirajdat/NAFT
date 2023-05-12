@@ -15,12 +15,11 @@ function Card({ props }) {
     const [buyerUsername, setBuyerUsername] = useState(null);
     const [sellerPrice, setSellerPrice] = useState(null);
     const [buying, setBuying] = useState(false);
-    const [disbaleWorking, setDisbaleWorking] = useState(false);
     const [isBuying, setIsBuying] = useState(false);
+    const [slider, setSlider] = useState(props.currentlyListed ? `slideron` : `slideroff`);
     const [image, setImage] = useState('');
 
-    console.log("props");
-    console.log(props);
+    console.log(props.owner, address);
 
     useEffect(() => {
         getUrl();
@@ -65,22 +64,46 @@ function Card({ props }) {
     };
 
 
-    const nftEnableDisbale = async (e) => {
+
+    const changeSell = async (e) => {
         e.preventDefault();
-        if (props.currentlyListed) {
-            setDisbaleWorking(true);
-            const contract = await contractSigner(provider[0]);
-            const tx = await contract.disableNft(props.tokenId);
-            toastFunction(TOASTS.INFO, "pending transaction... Please wait.... ");
-            await tx.wait();
-            toastFunction(TOASTS.SUCCESS, "Successfully Changed Price");
-            setDisbaleWorking(false);
-            dispatch(fetchAllNfts());
-            dispatch(fetchMyNfts(provider[0]));
+        try {
+
+            if (props.currentlyListed) {
+                try {
+                    setSlider(`slideroff`);
+                    const contract = await contractSigner(provider[0]);
+                    const tx = await contract.disableNft(props.tokenId);
+                    toastFunction(TOASTS.INFO, "pending transaction... Please wait.... ");
+                    await tx.wait();
+                    toastFunction(TOASTS.SUCCESS, "Now NFT is disabled ");
+                    dispatch(fetchAllNfts());
+                    dispatch(fetchMyNfts(provider[0]));
+                } catch (error) {
+                    console.log(error.message);
+                    setSlider(`slideron`);
+                }
+
+            } else {
+                try {
+                    setSlider(`slideron`);
+                    const contract = await contractSigner(provider[0]);
+                    const tx = await contract.enableNft(props.tokenId);
+                    toastFunction(TOASTS.INFO, "pending transaction... Please wait.... ");
+                    await tx.wait();
+                    toastFunction(TOASTS.SUCCESS, "Now NFT enable for sell ");
+                    dispatch(fetchAllNfts());
+                    dispatch(fetchMyNfts(provider[0]));
+                } catch (error) {
+                    console.log(error.message);
+                    setSlider(`slideroff`);
+                }
+            }
+
+        } catch (error) {
+            console.log(error.message);
         }
     };
-
-
 
 
     const OnChnageUsername = (e) => {
@@ -147,131 +170,296 @@ function Card({ props }) {
 
     return (
         <>
-            {props.show && props.currentlyListed == true &&
+            {props.ownnft ? (!address || address != props.owner) ?
 
-                <a href={`https://mumbai.polygonscan.com/token/0x7d9a27484b15008f608f201b624d0713503c9a66?a=${props.tokenId}`}>
-                    <li className="product-item">
+                <li className="product-item">
 
-                        <div className="product-card" tabIndex="0">
+                    <div className="product-card" tabIndex="0">
+                        <a href={`https://mumbai.polygonscan.com/token/0x7d9a27484b15008f608f201b624d0713503c9a66?a=${props.tokenId}`}>
+
                             <figure className="product-banner">
 
                                 <img src={image} alt="Getting NFT Data From Pinata So it take some minutes to display wait ..." />
 
                             </figure>
+                        </a >
 
-                            <div className="product-content">
+                        <div className="product-content">
 
-                                <a href="#" className="h4 product-title" style={{
-                                    color: 'white'
-                                }}>{props.title}</a>
+                            <a className="h4 product-title" style={{
+                                color: 'white'
+                            }}>{props.title}</a>
 
-                                <div className="product-meta" style={{
-                                    color: 'white'
-                                }}>
-                                    {!buying &&
-                                        <div className="product-author">
+                            <div className="product-meta" style={{
+                                color: 'white'
+                            }}>
+                                {!buying &&
+                                    <div className="product-author">
 
-                                            <figure className="author-img">
-                                                <img src="/images/bidding-user.png" alt="Jack Reacher" />
-                                            </figure>
+                                        <figure className="author-img">
+                                            <img src="/images/bidding-user.png" alt="Jack Reacher" />
+                                        </figure>
 
-                                            <div className="author-content">
-                                                <h4 className="h5 author-title">{props.owner ? `${props.owner.slice(0, 4)} ... ${props.owner.slice(-4)}` : "...."}</h4>
+                                        <div className="author-content">
+                                            <h4 className="h5 author-title">{props.owner ? `${props.owner.slice(0, 4)} ... ${props.owner.slice(-4)}` : "...."}</h4>
 
-                                            </div>
                                         </div>
-                                    }
-
-                                    {!buying && <div className="product-price">
-                                        <data value="0.568">{props.price}</data>
-
-                                        <p className="label">MATIC</p>
                                     </div>
-                                    }
+                                }
+
+                                {!buying && <div className="product-price">
+                                    <data value="0.568">{props.price}</data>
+
+                                    <p className="label">MATIC</p>
                                 </div>
+                                }
+                            </div>
 
-                                <div className="product-footer">
-                                    {!address || address != props.owner ?
+                            <div className="product-footer">
+                                {
 
 
 
-                                        buying ?
-                                            <div>
+                                    buying ?
+                                        <div>
 
-                                                < div >
-                                                    <input type={'text'} style={{ height: "40px", width: "auto", marginBottom: "40px" }} onChange={OnChnageUsername} placeholder={"username"} className="search-field" />
-                                                </div>
-
-                                                {!isBuying ?
-
-                                                    <div style={{
-                                                        display: "flex",
-                                                        justifyContent: "space-between",
-                                                        gap: "20px"
-                                                    }}>
-                                                        <button className="place-bid-btn" onClick={BuyNFT}>Buy Now</button>
-                                                        <button className="btn-secondar" onClick={isBuyingNowCancel}>Cancel</button>
-                                                    </div> :
-                                                    <button className="btn btn-second">
-                                                        <ClipLoader color={"#ffffff"} loading={true} size={25} cssOverride={{
-                                                            background: 'transparent'
-                                                        }} />
-                                                    </button>
-                                                }
+                                            < div >
+                                                <input type={'text'} style={{ height: "40px", width: "auto", marginBottom: "40px" }} onChange={OnChnageUsername} placeholder={"username"} className="search-field" />
                                             </div>
-                                            : <>
 
-                                                <button className="place-bid-btn" onClick={BuyNFT}>Buy Now</button>
+                                            {!isBuying ?
 
-                                            </>
-                                        :
-
-
-                                        buying ?
-                                            <div>
-
-                                                < div >
-                                                    <input type={'text'} style={{ height: "40px", width: "auto", marginBottom: "40px" }} onChange={OnChnagePrice} placeholder={"price"} className="search-field" />
-                                                </div>
-
-                                                {!isBuying ?
-
-                                                    <div style={{
-                                                        display: "flex",
-                                                        justifyContent: "space-between",
-                                                        gap: "20px"
-                                                    }}>
-                                                        <button className="place-bid-btn" onClick={ChangeThePrice}>Change Price</button>
-                                                        <button className="btn-secondar" onClick={isBuyingNowCancel}>Cancel</button>
-                                                    </div> :
-                                                    <button className="btn btn-second">
-                                                        <ClipLoader color={"#ffffff"} loading={true} size={25} cssOverride={{
-                                                            background: 'transparent'
-                                                        }} />
-                                                    </button>
-                                                }
-                                            </div>
-                                            : <>
                                                 <div style={{
                                                     display: "flex",
                                                     justifyContent: "space-between",
                                                     gap: "20px"
                                                 }}>
-                                                    <button className="place-bid-btn" onClick={isBuyingNow}>Change Price</button>
-                                                    {!disbaleWorking && <button className="btn-secondar" style={{
-                                                        color: 'red'
-                                                    }} onClick={nftEnableDisbale}>Disable</button>}
-                                                </div>
+                                                    <button className="place-bid-btn" onClick={BuyNFT}>Buy Now</button>
+                                                    <button className="btn-secondar" onClick={isBuyingNowCancel}>Cancel</button>
+                                                </div> :
+                                                <button className="btn btn-second">
+                                                    <ClipLoader color={"#ffffff"} loading={true} size={25} cssOverride={{
+                                                        background: 'transparent'
+                                                    }} />
+                                                </button>
+                                            }
+                                        </div>
+                                        : <>
 
-                                            </>
-                                    }
-                                </div>
+                                            <button className="place-bid-btn" onClick={BuyNFT}>Buy Now</button>
 
+                                        </>
+
+
+                                }
                             </div>
-                        </div>
-                    </li>
-                </a >
 
+                        </div>
+                    </div>
+                </li>
+                :
+
+                <li className="product-item">
+                    <div className="product-card" tabIndex="0">
+
+                        <div style={{
+                            display: "flex",
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: "20px",
+                            marginBottom: "20px",
+                        }}>
+                            <span style={{
+                                height: "20px",
+                                paddingTop: "25px",
+                                paddingBottom: "25px",
+
+                            }}>Sell</span>
+                            <div onClick={changeSell} >
+
+                                <label className="switch" >
+                                    <input type="checkbox" />
+                                    <span className={`slider ${slider}`} ></span>
+                                </label>
+                            </div>
+
+                        </div>
+
+                        <a href={`https://mumbai.polygonscan.com/token/0x7d9a27484b15008f608f201b624d0713503c9a66?a=${props.tokenId}`}>
+
+                            <figure className="product-banner">
+
+                                <img src={image} alt="Getting NFT Data From Pinata So it take some minutes to display wait ..." />
+
+                            </figure>
+                        </a >
+
+                        <div className="product-content">
+
+                            <a className="h4 product-title" style={{
+                                color: 'white'
+                            }}>{props.title}</a>
+
+                            <div className="product-meta" style={{
+                                color: 'white'
+                            }}>
+                                {!buying &&
+                                    <div className="product-author">
+
+                                        <figure className="author-img">
+                                            <img src="/images/bidding-user.png" alt="Jack Reacher" />
+                                        </figure>
+
+                                        <div className="author-content">
+                                            <h4 className="h5 author-title">{props.owner ? `${props.owner.slice(0, 4)} ... ${props.owner.slice(-4)}` : "...."}</h4>
+
+                                        </div>
+                                    </div>
+                                }
+
+                                {!buying && <div className="product-price">
+                                    <data value="0.568">{props.price}</data>
+
+                                    <p className="label">MATIC</p>
+                                </div>
+                                }
+                            </div>
+
+                            <div className="product-footer">
+                                {
+
+
+                                    buying ?
+                                        <div>
+
+                                            < div >
+                                                <input type={'text'} style={{ height: "40px", width: "auto", marginBottom: "40px" }} onChange={OnChnagePrice} placeholder={"price"} className="search-field" />
+                                            </div>
+
+                                            {!isBuying ?
+
+                                                <div style={{
+                                                    display: "flex",
+                                                    justifyContent: "space-between",
+                                                    gap: "20px"
+                                                }}>
+                                                    <button className="place-bid-btn" onClick={ChangeThePrice}>Change Price</button>
+                                                    <button className="btn-secondar" onClick={isBuyingNowCancel}>Cancel</button>
+                                                </div> :
+                                                <button className="btn btn-second">
+                                                    <ClipLoader color={"#ffffff"} loading={true} size={25} cssOverride={{
+                                                        background: 'transparent'
+                                                    }} />
+                                                </button>
+                                            }
+                                        </div>
+                                        : <>
+                                            <div style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                gap: "20px",
+                                                alignItems: 'center',
+                                            }}>
+                                                <button className="place-bid-btn" onClick={isBuyingNow}>Change Price</button>
+
+
+
+                                            </div>
+                                        </>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </li >
+
+                : (!address || address != props.owner) && props.currentlyListed &&
+
+                <li className="product-item">
+
+                    <div className="product-card" tabIndex="0">
+                        <a href={`https://mumbai.polygonscan.com/token/0x7d9a27484b15008f608f201b624d0713503c9a66?a=${props.tokenId}`}>
+
+                            <figure className="product-banner">
+
+                                <img src={image} alt="Getting NFT Data From Pinata So it take some minutes to display wait ..." />
+
+                            </figure>
+                        </a >
+
+                        <div className="product-content">
+
+                            <a className="h4 product-title" style={{
+                                color: 'white'
+                            }}>{props.title}</a>
+
+                            <div className="product-meta" style={{
+                                color: 'white'
+                            }}>
+                                {!buying &&
+                                    <div className="product-author">
+
+                                        <figure className="author-img">
+                                            <img src="/images/bidding-user.png" alt="Jack Reacher" />
+                                        </figure>
+
+                                        <div className="author-content">
+                                            <h4 className="h5 author-title">{props.owner ? `${props.owner.slice(0, 4)} ... ${props.owner.slice(-4)}` : "...."}</h4>
+
+                                        </div>
+                                    </div>
+                                }
+
+                                {!buying && <div className="product-price">
+                                    <data value="0.568">{props.price}</data>
+
+                                    <p className="label">MATIC</p>
+                                </div>
+                                }
+                            </div>
+
+                            <div className="product-footer">
+                                {
+
+
+
+                                    buying ?
+                                        <div>
+
+                                            < div >
+                                                <input type={'text'} style={{ height: "40px", width: "auto", marginBottom: "40px" }} onChange={OnChnageUsername} placeholder={"username"} className="search-field" />
+                                            </div>
+
+                                            {!isBuying ?
+
+                                                <div style={{
+                                                    display: "flex",
+                                                    justifyContent: "space-between",
+                                                    gap: "20px"
+                                                }}>
+                                                    <button className="place-bid-btn" onClick={BuyNFT}>Buy Now</button>
+                                                    <button className="btn-secondar" onClick={isBuyingNowCancel}>Cancel</button>
+                                                </div> :
+                                                <button className="btn btn-second">
+                                                    <ClipLoader color={"#ffffff"} loading={true} size={25} cssOverride={{
+                                                        background: 'transparent'
+                                                    }} />
+                                                </button>
+                                            }
+                                        </div>
+                                        : <>
+
+                                            <button className="place-bid-btn" onClick={BuyNFT}>Buy Now</button>
+
+                                        </>
+
+
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </li>
             }
         </>
 

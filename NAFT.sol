@@ -78,6 +78,13 @@ contract NFTMarketplace is ERC721URIStorage {
         idToListedToken[_tokenId].currentlyListed = false;
     }
 
+        function enableNft(uint256 _tokenId) public {
+        address ownerNft = idToListedToken[_tokenId].owner;
+        require(ownerNft == msg.sender, "Only NFT owner can update  nft");
+        require(idToListedToken[_tokenId].currentlyListed == false, "You can not enable it");
+        idToListedToken[_tokenId].currentlyListed = true;
+    }
+
     function updateListPrice(uint256 _listPrice) public payable {
         require(owner == msg.sender, "Only owner can update listing price");
         listPrice = _listPrice;

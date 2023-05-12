@@ -1,59 +1,62 @@
-import React from 'react'
-import Card from './Card'
+import React from 'react';
+import Card from './Card';
 import Router from 'next/router';
 import { useSelector } from 'react-redux';
 
-const Explore = ({ name, explore, ownnft}) => {
+const Explore = ({ name, explore, ownnft }) => {
   const { address } = useSelector((state) => state.auth);
   return (
     <div>
-      {explore && 
-          <section id="explore" className="explore-product">
-              <div className="container">
+      {explore &&
+        <section id="explore" className="explore-product">
+          <div className="container">
 
-                  <div className="section-header-wrapper">
+            <div className="section-header-wrapper">
 
-                      <h2 className="h2 section-title">{name}</h2>
+              <h2 className="h2 section-title">{name}</h2>
               {ownnft ?
                 <button className="btn btn-secondary">{explore.length} : nfts</button> :
-                <button onClick={() => { Router.push("/createnft") }} className="btn btn-secondary">Create now</button>
+                <button onClick={() => { Router.push("/createnft"); }} className="btn btn-secondary">Create now</button>
               }
 
-                  </div>
+            </div>
 
-                  <ul className="product-list">
+            <ul className="product-list">
 
-            {  explore.map((data)=>{
-              console.log("data in explore");
-              // const contract = await contractLinkProvider();
-              // const userName = await contract.username()[data.tokenId];
+              {explore.map((data) => {
+                console.log("data in explore");
+                // const contract = await contractLinkProvider();
+                // const userName = await contract.username()[data.tokenId];
 
-              console.log(data);
-                  return (
+                console.log(data);
+                return (
+                  <div>
                     <Card props={{
                       "tokenId": data.tokenId,
                       "title": data.title,
                       "nftURL": data.nftURL,
-                      "owner":data.owner,
-                      "price":data.price,
+                      "owner": data.owner,
+                      "price": data.price,
                       "currentlyListed": data.currentlyListed,
-                      "show": address ? ownnft ? true : data.owner == address ? false : true: true
+                      "ownnft": ownnft
                     }} />
-                  )
+                  </div>
+
+                );
               })
-            }  
-                     
+              }
 
 
-                  </ul>
 
-              </div>
-          </section>
-}
+            </ul>
+
+          </div>
+        </section>
+      }
     </div>
-  )
-}
+  );
+};
 
 
 
-export default Explore
+export default Explore;
